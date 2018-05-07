@@ -17,7 +17,8 @@ int DataStore::open_hash(const std::string &hash, const std::string &real_path, 
     if (hash_not_found(hash, real_path) == 0) {
         res = open(path.c_str(), flags);
         if (res == -1) {
-            printf("ERROR: Unable to open file %s of hash %s after successful fetch\n", real_path.c_str(), hash.c_str());
+            printf("ERROR: Unable to open file %s of hash %s after successful fetch\n", real_path.c_str(),
+                   hash.c_str());
             exit(1);
         }
         return res;
