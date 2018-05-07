@@ -47,11 +47,11 @@ void HashFS::lstat(const Node *n, struct stat *st) {
     st->st_gid = n->gid();
     st->st_size = n->size();
     st->st_blocks = n->blockcnt();
-    st->st_atim.tv_nsec = n->mtime_ns(); // use mtime as atime
+    st->st_atim.tv_nsec = n->mtime_ns() % 1000000000; // use mtime as atime
     st->st_atim.tv_sec = n->mtime_ns() / 1000000000;
-    st->st_mtim.tv_nsec = n->mtime_ns();
+    st->st_mtim.tv_nsec = n->mtime_ns() % 1000000000;
     st->st_mtim.tv_sec = n->mtime_ns() / 1000000000;
-    st->st_ctim.tv_nsec = n->ctime_ns();
+    st->st_ctim.tv_nsec = n->ctime_ns() % 1000000000;
     st->st_ctim.tv_sec = n->ctime_ns() / 1000000000;
 }
 
