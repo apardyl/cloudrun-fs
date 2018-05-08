@@ -94,8 +94,11 @@ int HashFS::getdir(const char *path, void *buf, fuse_fill_dir_t filler) {
             errno = ENOTDIR;
             return -1;
         } else {
+            struct stat st{};
+            lstat(n, &st);
+            filler(buf, ".", &st, 0);
+            filler(buf, "..", nullptr, 0);
             for (const auto &d : n->childern()) {
-                struct stat st{};
                 lstat(&d.second, &st);
                 if (filler(buf, d.first.c_str(), &st, 0)) {
                     break;
