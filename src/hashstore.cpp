@@ -14,7 +14,7 @@ int HashStore::open_hash(const std::string &hash, const std::string &real_path, 
     if (res != -1 || errno != ENOENT) {
         return res;
     }
-    if (downloader->fetchFile(real_path, path) == 0) {
+    if (downloader->fetch_file(real_path, path) == 0) {
         res = open(path.c_str(), flags);
         if (res == -1) {
             printf("ERROR: Unable to open file %s of hash %s after successful fetch\n", real_path.c_str(),
@@ -29,7 +29,7 @@ int HashStore::open_hash(const std::string &hash, const std::string &real_path, 
     }
 }
 
-HashStore::HashStore(std::string base_path, FileDownloader *downloader)
+HashStore::HashStore(std::string base_path, FileRequester *downloader)
         : base_path(std::move(base_path)), downloader(downloader) {
     if (base_path[base_path.size() - 1] == '/') {
         this->base_path.pop_back();

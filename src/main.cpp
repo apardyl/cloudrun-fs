@@ -4,7 +4,7 @@
 
 
 int main(int argc, char *argv[]) {
-    FileDownloader downloader;
+    FileRequester downloader(30001);
 
     HashStore store("/tmp/data", &downloader);
     filesystem::Filesystem fs;
