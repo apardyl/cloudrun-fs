@@ -4,7 +4,9 @@
 
 
 int main(int argc, char *argv[]) {
-    DataStore store("/tmp/data");
+    FileDownloader downloader;
+
+    HashStore store("/tmp/data", &downloader);
     filesystem::Filesystem fs;
 
     int res = open("fs.meta", O_RDONLY);
@@ -19,7 +21,7 @@ int main(int argc, char *argv[]) {
     close(res);
 
     HashFS *hashfs = new HashFS(std::make_unique<filesystem::Filesystem>(std::move(fs)),
-                                std::make_unique<DataStore>(std::move(store)));
+                                std::make_unique<HashStore>(std::move(store)));
 
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
     fuse_opt_parse(&args, nullptr, nullptr, nullptr);

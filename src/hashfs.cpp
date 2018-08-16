@@ -2,7 +2,7 @@
 
 using namespace filesystem;
 
-HashFS::HashFS(std::unique_ptr<Filesystem> fs, std::unique_ptr<DataStore> ds) {
+HashFS::HashFS(std::unique_ptr<Filesystem> fs, std::unique_ptr<HashStore> ds) {
     this->fs = std::move(fs);
     this->store = std::move(ds);
 }

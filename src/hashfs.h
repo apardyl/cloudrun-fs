@@ -3,20 +3,20 @@
 
 #include <sys/stat.h>
 #include <fuse.h>
-#include "proto/hashfs/filesystem.pb.h"
-#include "datastore.h"
+#include "proto/filesystem.pb.h"
+#include "hashstore.h"
 
 class HashFS {
 private:
     std::unique_ptr<filesystem::Filesystem> fs;
-    std::unique_ptr<DataStore> store;
+    std::unique_ptr<HashStore> store;
 
     const filesystem::Node *getNode(const char *path);
 
     void lstat(const filesystem::Node *n, struct stat *st);
 
 public:
-    HashFS(std::unique_ptr<filesystem::Filesystem> fs, std::unique_ptr<DataStore> ds);
+    HashFS(std::unique_ptr<filesystem::Filesystem> fs, std::unique_ptr<HashStore> ds);
 
     int lstat(const char *path, struct stat *st);
 

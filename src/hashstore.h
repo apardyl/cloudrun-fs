@@ -2,17 +2,18 @@
 #define HASHFS_DATASTORE_H
 
 #include <string>
+#include "filedownloader.h"
 
-class DataStore {
+class HashStore {
 private:
     std::string base_path;
 
-    int hash_not_found(const std::string &hash, const std::string &real_path);
+    FileDownloader * downloader;
 
     std::string hash_to_path(const std::string &hash);
 
 public:
-    explicit DataStore(std::string base_path);
+    explicit HashStore(std::string store_path, FileDownloader *downloader);
 
     int open_hash(const std::string &hash, const std::string &real_path, int flags);
 };

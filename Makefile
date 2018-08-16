@@ -1,5 +1,5 @@
 srcdir := src
-protodir := src/proto/hashfs
+protodir := src/proto
 gendir := gen
 builddir := build
 outdir := bin
@@ -15,7 +15,7 @@ LDFLAGS = -fPIC -lprotobuf -lfuse -pthread -g
 
 CSOURCES := $(shell find $(srcdir) -type f -name *.c)
 CXXSOURCES := $(shell find $(srcdir) -type f -name *.cpp)
-PROTOSOURCES := $(shell find $(protodir) -type f -name *.proto)
+PROTOSOURCES := src/proto/filesystem.proto src/proto/filedownload.proto
 
 COBJS := $(CSOURCES:$(srcdir)/%.c=$(builddir)/%.c.o)
 CXXOBJS := $(CXXSOURCES:$(srcdir)/%.cpp=$(builddir)/%.cxx.o)

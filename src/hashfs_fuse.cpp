@@ -9,12 +9,13 @@
 
 #include "hashfs_fuse.h"
 #include "hashfs.h"
+#include "config.h"
 
 static HashFS *fs;
 
 static int hfs_getattr(const char *path, struct stat *stbuf) {
     int res;
-    printf("getattr %s\n", path);
+    debug_print("getattr %s\n", path);
 
     res = fs->lstat(path, stbuf);
     if (res == -1) {
@@ -26,11 +27,12 @@ static int hfs_getattr(const char *path, struct stat *stbuf) {
 
 static int hfs_readlink(const char *path, char *buf, size_t size) {
     ssize_t res;
-    printf("readlink %s\n", path);
+    debug_print("readlink %s\n", path);
 
     res = fs->readlink(path, buf, size - 1);
-    if (res == -1)
+    if (res == -1) {
         return -errno;
+    }
 
     buf[res] = '\0';
     return 0;
@@ -38,7 +40,7 @@ static int hfs_readlink(const char *path, char *buf, size_t size) {
 
 static int hfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                        off_t offset, struct fuse_file_info *fi) {
-    printf("readdir %s\n", path);
+    debug_print("readdir %s\n", path);
 
     (void) offset;
     (void) fi;
@@ -52,13 +54,14 @@ static int hfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 }
 
 static int hfs_open(const char *path, struct fuse_file_info *fi) {
-    printf("open %s\n", path);
+    debug_print("open %s\n", path);
 
     int fd;
 
     fd = fs->open(path, fi->flags);
-    if (fd == -1)
+    if (fd == -1) {
         return -errno;
+    }
 
     fi->fh = static_cast<uint64_t>(fd);
     return 0;
@@ -72,7 +75,7 @@ static int hfs_release(const char *path, struct fuse_file_info *fi) {
 
 static int hfs_read(const char *path, char *buf, size_t size, off_t offset,
                     struct fuse_file_info *fi) {
-    printf("read %s\n", path);
+    debug_print("read %s\n", path);
 
     int res;
 
