@@ -6,10 +6,10 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-7
+      - fuse
 
 env:
-  - CC=gcc-7
-  - CXX=g++-7
+  - CC=gcc-7 CXX=g++-7
 
 before_install:
   - export PATH=$HOME/.local/bin:$HOME/protobuf/bin:$PATH

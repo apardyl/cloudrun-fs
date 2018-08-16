@@ -4,10 +4,10 @@ gendir := gen
 builddir := build
 outdir := bin
 
-CC := gcc
-CXX := g++
-PROTOC := protoc
-LD := g++
+CC ?= gcc
+CXX ?= g++
+PROTOC ?= protoc
+LD ?= g++
 CPREFLAGS := -D_FILE_OFFSET_BITS=64 -I $(gendir)
 CFLAGS := -O0 -g -fPIC $(CPREFLAGS)
 CXXFLAGS := $(CFLAGS)
