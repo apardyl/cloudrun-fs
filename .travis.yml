@@ -1,0 +1,28 @@
+language: cpp
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+
+env:
+  - CC=gcc-7
+  - CXX=g++-7
+
+before_install:
+  - export PATH=$HOME/.local/bin:$HOME/protobuf/bin:$PATH
+  - export MAKEFLAGS=-j$(nproc)
+
+cache:
+  directories:
+    - $HOME/protobuf
+
+install:
+  - mkdir -p $HOME/protobuf && pushd $HOME/protobuf
+    && curl -LO 'https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip'
+    && unzip protoc-3.6.1-linux-x86_64.zip
+    && popd
+
+script: make
