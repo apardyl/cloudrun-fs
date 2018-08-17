@@ -8,12 +8,11 @@ addons:
       - g++-7
       - fuse
 
-env:
-  - CC=gcc-7 CXX=g++-7
-
 before_install:
   - export PATH=$HOME/.local/bin:$HOME/protobuf/bin:$PATH
   - export MAKEFLAGS=-j$(nproc)
+  - export CC=gcc-7
+  - export CXX=g++-7
 
 cache:
   directories:
