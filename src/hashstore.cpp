@@ -13,8 +13,10 @@ int HashStore::open_hash(const std::string &hash, const std::string &real_path, 
     std::string path = hash_to_path(hash);
     int res = open(path.c_str(), flags);
     if (res != -1 || errno != ENOENT) {
+        debug_print("Found file for hash %s\n", hash.c_str());
         return res;
     }
+    debug_print("Fetching file for hash %s\n", hash.c_str());
     if (downloader->fetch_file(real_path, path) == 0) {
         res = open(path.c_str(), flags);
         if (res == -1) {
@@ -25,7 +27,7 @@ int HashStore::open_hash(const std::string &hash, const std::string &real_path, 
         return res;
     } else {
         debug_print("No file for hash %s\n", hash.c_str());
-        errno = ENOENT;
+        errno = EACCES;
         return -1;
     }
 }

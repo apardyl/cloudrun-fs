@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
     HashStore store("/tmp/data", &remoteFSConnection);
     filesystem::Filesystem fs;
 
-    int res = open("fs.meta", O_RDONLY);
+    int res = open("filesystem.meta", O_RDONLY);
     if (res == -1) {
         printf("unable to open fs.meta\n");
         exit(1);
