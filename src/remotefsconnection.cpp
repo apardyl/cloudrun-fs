@@ -121,7 +121,9 @@ int RemoteFSConnection::fetch_file(const std::string &filename, const std::strin
         if (concurrent_downloads.count(filename) == 0) {
             concurrent_downloads[filename] = std::make_unique<std::condition_variable>();
         } else {
-            concurrent_downloads[filename]->wait(lock);
+            do {
+                concurrent_downloads[filename]->wait(lock);
+            } while (concurrent_downloads.count(filename) > 0);
         }
     }
 
@@ -130,8 +132,9 @@ int RemoteFSConnection::fetch_file(const std::string &filename, const std::strin
 
     {
         std::unique_lock<std::mutex> lock(download_mutex);
-        concurrent_downloads[filename]->notify_all();
+        auto ptr = std::move(concurrent_downloads[filename]);
         concurrent_downloads.erase(filename);
+        ptr->notify_all();
     }
     return res ? 0 : -1;
 }
