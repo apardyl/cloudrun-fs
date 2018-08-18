@@ -1,11 +1,12 @@
 #include "hashstore.h"
+#include "config.h"
 
 #include <utility>
 #include <fcntl.h>
 
 int HashStore::open_hash(const std::string &hash, const std::string &real_path, int flags) {
     if (hash.size() < 8) {
-        printf("Invalid hash %s\n", hash.c_str());
+        debug_print("Invalid hash %s\n", hash.c_str());
         errno = EINVAL;
         return -1;
     }
@@ -17,19 +18,19 @@ int HashStore::open_hash(const std::string &hash, const std::string &real_path, 
     if (downloader->fetch_file(real_path, path) == 0) {
         res = open(path.c_str(), flags);
         if (res == -1) {
-            printf("ERROR: Unable to open file %s of hash %s after successful fetch\n", real_path.c_str(),
+            debug_print("ERROR: Unable to open file %s of hash %s after successful fetch\n", real_path.c_str(),
                    hash.c_str());
             exit(1);
         }
         return res;
     } else {
-        printf("No file for hash %s\n", hash.c_str());
+        debug_print("No file for hash %s\n", hash.c_str());
         errno = ENOENT;
         return -1;
     }
 }
 
-HashStore::HashStore(std::string base_path, FileRequester *downloader)
+HashStore::HashStore(std::string base_path, RemoteFSConnection *downloader)
         : base_path(std::move(base_path)), downloader(downloader) {
     if (base_path[base_path.size() - 1] == '/') {
         this->base_path.pop_back();

@@ -2,18 +2,18 @@
 #define HASHFS_DATASTORE_H
 
 #include <string>
-#include "filerequester.h"
+#include "remotefsconnection.h"
 
 class HashStore {
 private:
     std::string base_path;
 
-    FileRequester * downloader;
+    RemoteFSConnection * downloader;
 
     std::string hash_to_path(const std::string &hash);
 
 public:
-    explicit HashStore(std::string store_path, FileRequester *downloader);
+    explicit HashStore(std::string store_path, RemoteFSConnection *downloader);
 
     int open_hash(const std::string &hash, const std::string &real_path, int flags);
 };

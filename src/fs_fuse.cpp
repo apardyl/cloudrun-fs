@@ -7,7 +7,7 @@
 #include <dirent.h>
 #include <cerrno>
 
-#include "hashfs_fuse.h"
+#include "fs_fuse.h"
 #include "hashfs.h"
 #include "config.h"
 

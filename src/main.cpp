@@ -1,12 +1,12 @@
 #include <iostream>
 #include <unistd.h>
-#include "hashfs_fuse.h"
+#include "fs_fuse.h"
 
 
 int main(int argc, char *argv[]) {
-    FileRequester downloader(30001);
+    RemoteFSConnection remoteFSConnection("127.0.0.1:30000");
 
-    HashStore store("/tmp/data", &downloader);
+    HashStore store("/tmp/data", &remoteFSConnection);
     filesystem::Filesystem fs;
 
     int res = open("fs.meta", O_RDONLY);

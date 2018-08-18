@@ -7,15 +7,15 @@ outdir := bin
 CC ?= gcc
 CXX ?= g++
 PROTOC ?= protoc
-LD ?= g++
-CPREFLAGS := -D_FILE_OFFSET_BITS=64 -I $(gendir)
+LD = g++
+CPREFLAGS := -D_FILE_OFFSET_BITS=64 -I $(gendir) -I $(srcdir)
 CFLAGS := -O0 -g -fPIC $(CPREFLAGS)
 CXXFLAGS := $(CFLAGS)
-LDFLAGS = -fPIC -lprotobuf -lfuse -pthread -g
+LDFLAGS = -fPIC -lprotobuf -lfuse -lgrpc++ -pthread -g
 
 CSOURCES := $(shell find $(srcdir) -type f -name *.c)
 CXXSOURCES := $(shell find $(srcdir) -type f -name *.cpp)
-PROTOSOURCES := src/proto/filesystem.proto src/proto/filedownload.proto
+PROTOSOURCES := src/proto/filesystem.proto src/proto/remotefs.proto
 
 COBJS := $(CSOURCES:$(srcdir)/%.c=$(builddir)/%.c.o)
 CXXOBJS := $(CXXSOURCES:$(srcdir)/%.cpp=$(builddir)/%.cxx.o)
@@ -23,11 +23,11 @@ CDEPS := $(SOURCES:$(srcdir)/%.c=$(builddir)/%.c.d)
 CXXDEPS := $(CXXSOURCES:$(srcdir)/%.cpp=$(builddir)/%.cxx.d)
 
 PROTOHEAD := $(PROTOSOURCES:$(srcdir)/%.proto=$(gendir)/%.pb.h)
-PROTOOBJS := $(PROTOSOURCES:$(srcdir)/%.proto=$(builddir)/%.pb.o)
+PROTOOBJS := $(PROTOSOURCES:$(srcdir)/%.proto=$(builddir)/%.pb.o) $(PROTOSOURCES:$(srcdir)/%.proto=$(builddir)/%.grpc.pb.o)
 PROTOCFILES := $(PROTOSOURCES:$(srcdir)/%.proto=$(gendir)/%.pb.cc)
 
-TARGET := $(outdir)/hashfs
-INSTALLTARGET := /usr/local/bin/hashfs
+TARGET := $(outdir)/cloudrun-fs
+INSTALLTARGET := /usr/local/bin/cloudrun-fs
  
 all: $(TARGET)
 
@@ -46,7 +46,8 @@ $(builddir)/%.pb.o: generated
 $(gendir)/%.pb.h: $(srcdir)/%.proto
 	@echo Generating proto $@
 	@mkdir -p "$(@D)"
-	$(PROTOC) $< -I $(<D) --cpp_out=$(@D)
+	$(PROTOC) $< -I $(protodir) --grpc_out=$(@D) --plugin=protoc-gen-grpc=`which grpc_cpp_plugin`
+	$(PROTOC) $< -I $(protodir) --cpp_out=$(@D)
  
 $(builddir)/%.c.o: $(srcdir)/%.c generated $(builddir)/%.c.d
 	@echo Building $@
