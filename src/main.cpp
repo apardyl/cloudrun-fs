@@ -4,12 +4,17 @@
 
 
 int main(int argc, char *argv[]) {
-    RemoteFSConnection remoteFSConnection("127.0.0.1:30000");
+    if (argc < 5) {
+        printf("Usage:\n");
+        printf("cloudrun-fs <filesystem meta file> <hash store path> <private store path> <remote address:remote port>\n");
+    }
 
-    HashStore store("/tmp/data", &remoteFSConnection);
+    RemoteFSConnection remoteFSConnection(argv[4]);
+
+    HashStore store(argv[2], &remoteFSConnection);
     filesystem::Filesystem fs;
 
-    int res = open("filesystem.meta", O_RDONLY);
+    int res = open(argv[1], O_RDONLY);
     if (res == -1) {
         printf("unable to open fs.meta\n");
         exit(1);
@@ -21,7 +26,7 @@ int main(int argc, char *argv[]) {
     close(res);
 
     auto *hashfs = new HashFS(std::make_unique<filesystem::Filesystem>(std::move(fs)), &store);
-    CachedFileStore cachedFileStore("/tmp/private", &remoteFSConnection);
+    CachedFileStore cachedFileStore(argv[3], &remoteFSConnection);
     auto *cachefs = new CacheFS(&remoteFSConnection, &cachedFileStore);
 
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);

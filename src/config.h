@@ -1,7 +1,7 @@
 #ifndef CLOUDRUN_HASHFS_CONFIG_H
 #define CLOUDRUN_HASHFS_CONFIG_H
 
-#define DEBUG 1
+#define DEBUG 0
 
 #include <cstdio>
 #define debug_print(fmt, ...) \
