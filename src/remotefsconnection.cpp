@@ -10,6 +10,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <utils/fsutils.h>
+#include "proto/filesystem.pb.h"
 
 using namespace remotefs;
 using grpc::ClientContext;
@@ -33,6 +35,50 @@ int RemoteFSConnection::get_checksum(const std::string &filename, std::string *c
     }
     errno = status_to_errno(status);
     return status.error_code();
+}
+
+int RemoteFSConnection::get_stat(const std::string &filename, filesystem::Stat *st) {
+    ClientContext context;
+    FileRequest request;
+    request.set_path(filename);
+    Status status = stub->GetStat(&context, request, st);
+    errno = status_to_errno(status);
+    return status.error_code();
+}
+
+
+int RemoteFSConnection::get_stat(const std::string &filename, struct stat *st) {
+    filesystem::Stat response;
+    int res = get_stat(filename, &response);
+    if (res == 0) {
+        protoToStat(response, st);
+    }
+    return res;
+}
+
+
+int RemoteFSConnection::get_dir(const std::string &path, filesystem::Node *node) {
+    ClientContext context;
+    FileRequest request;
+    request.set_path(path);
+    FileListResponse response;
+    Status status = stub->ListDirectory(&context, request, &response);
+    if (!status.ok()) {
+        return status_to_errno(status);
+    }
+    auto &children = *(node->mutable_childern());
+    for (auto &item : response.item()) {
+        debug_print("Adding item %s to %s\n", item.name().c_str(), path.c_str());
+        auto n = filesystem::Node();
+        n.set_partial(true);
+        if (!item.target().empty()) {
+            n.set_target(item.target());
+        }
+        *n.mutable_stat() = item.stat();
+        children[item.name()] = std::move(n);
+    }
+    node->set_partial(false);
+    return 0;
 }
 
 bool RemoteFSConnection::create_base_dir(const std::string &filename) {

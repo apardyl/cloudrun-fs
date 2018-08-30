@@ -9,20 +9,18 @@
 class HashFS {
 private:
     std::unique_ptr<filesystem::Filesystem> fs;
-    std::unique_ptr<HashStore> store;
+    HashStore *store;
 
-    const filesystem::Node *getNode(const char *path);
-
-    void lstat(const filesystem::Node *n, struct stat *st);
+    const filesystem::Node *getNode(const char *path, bool *  noent_authoritative);
 
 public:
-    HashFS(std::unique_ptr<filesystem::Filesystem> fs, std::unique_ptr<HashStore> ds);
+    HashFS(std::unique_ptr<filesystem::Filesystem> fs, HashStore *ds);
 
     int lstat(const char *path, struct stat *st);
 
     ssize_t readlink(const char *path, char *buf, size_t bufsiz);
 
-    int getdir(const char *path, void *buf, fuse_fill_dir_t filler);
+    int getdir(const char *path, std::map<std::string, struct stat> *dirs);
 
     int open(const char *pathname, int flags);
 };

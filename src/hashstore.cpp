@@ -32,14 +32,14 @@ int HashStore::open_hash(const std::string &hash, const std::string &real_path, 
     }
 }
 
-HashStore::HashStore(std::string base_path, RemoteFSConnection *downloader)
-        : base_path(std::move(base_path)), downloader(downloader) {
-    if (base_path[base_path.size() - 1] == '/') {
-        this->base_path.pop_back();
+HashStore::HashStore(std::string shared_cache_path, RemoteFSConnection *downloader)
+        : shared_cache_path(std::move(shared_cache_path)), downloader(downloader) {
+    if (shared_cache_path[shared_cache_path.size() - 1] == '/') {
+        this->shared_cache_path.pop_back();
     }
 }
 
 inline std::string HashStore::hash_to_path(const std::string &hash) {
-    return base_path + '/' + hash[0] + hash[1] + '/' + hash[2] + hash[3] + '/' + hash[4] + hash[5] + '/' + hash[6] +
+    return shared_cache_path + '/' + hash[0] + hash[1] + '/' + hash[2] + hash[3] + '/' + hash[4] + hash[5] + '/' + hash[6] +
            hash[7] + '/' + hash;
 }

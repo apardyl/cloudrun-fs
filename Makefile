@@ -8,10 +8,10 @@ CC ?= gcc
 CXX ?= g++
 PROTOC ?= protoc
 LD = g++
-CPREFLAGS := -D_FILE_OFFSET_BITS=64 -I $(gendir) -I $(srcdir)
+CPREFLAGS := -D_FILE_OFFSET_BITS=64 -I $(gendir) -I $(srcdir) --std=c++14
 CFLAGS := -O0 -g -fPIC $(CPREFLAGS)
 CXXFLAGS := $(CFLAGS)
-LDFLAGS = -fPIC -lprotobuf -lfuse -lgrpc++ -pthread -g
+LDFLAGS = -fPIC -l:libssl.so.1.0.0 -l:libcrypto.so.1.0.0 -lprotobuf -lfuse -lgrpc++ -pthread -g
 
 CSOURCES := $(shell find $(srcdir) -type f -name *.c)
 CXXSOURCES := $(shell find $(srcdir) -type f -name *.cpp)

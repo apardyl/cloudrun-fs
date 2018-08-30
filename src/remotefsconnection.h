@@ -24,6 +24,12 @@ public:
     int fetch_file(const std::string &filename, const std::string &save_as);
 
     int get_checksum(const std::string &filename, std::string *checksum);
+
+    int get_stat(const std::string &filename, struct stat *st);
+
+    int get_stat(const std::string &filename, filesystem::Stat *st);
+
+    int get_dir(const std::string &path, filesystem::Node *node);
 };
 
 

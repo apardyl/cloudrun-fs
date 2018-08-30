@@ -1,13 +1,14 @@
+#include <utils/fsutils.h>
 #include "hashfs.h"
 
 using namespace filesystem;
 
-HashFS::HashFS(std::unique_ptr<Filesystem> fs, std::unique_ptr<HashStore> ds) {
+HashFS::HashFS(std::unique_ptr<Filesystem> fs, HashStore *ds) {
+    this->store = ds;
     this->fs = std::move(fs);
-    this->store = std::move(ds);
 }
 
-const Node *HashFS::getNode(const char *path) {
+const Node *HashFS::getNode(const char *path, bool *noent_authoritative) {
     if (*path != '/') {
         throw std::runtime_error("invalid path: " + std::string(path));
     }
@@ -21,6 +22,7 @@ const Node *HashFS::getNode(const char *path) {
             auto n = node->childern().find(name);
             name.clear();
             if (n == node->childern().end()) {
+                *noent_authoritative = !node->partial();
                 return nullptr;
             } else {
                 node = &n->second;
@@ -32,6 +34,7 @@ const Node *HashFS::getNode(const char *path) {
     if (!name.empty()) {
         auto n = node->childern().find(name);
         if (n == node->childern().end()) {
+            *noent_authoritative = !node->partial();
             return nullptr;
         } else {
             node = &n->second;
@@ -40,36 +43,21 @@ const Node *HashFS::getNode(const char *path) {
     return node;
 }
 
-void HashFS::lstat(const Node *n, struct stat *st) {
-    const Stat * s = &(n->stat());
-    st->st_mode = s->mode();
-    st->st_nlink = S_ISDIR(s->mode()) ? 2 : 1;
-    st->st_uid = s->uid();
-    st->st_gid = s->gid();
-    st->st_size = s->size();
-    st->st_blocks = s->blockcnt();
-    st->st_atim.tv_nsec = s->mtime_ns() % 1000000000; // use mtime as atime
-    st->st_atim.tv_sec = s->mtime_ns() / 1000000000;
-    st->st_mtim.tv_nsec = s->mtime_ns() % 1000000000;
-    st->st_mtim.tv_sec = s->mtime_ns() / 1000000000;
-    st->st_ctim.tv_nsec = s->ctime_ns() % 1000000000;
-    st->st_ctim.tv_sec = s->ctime_ns() / 1000000000;
-}
-
-
 int HashFS::lstat(const char *path, struct stat *st) {
-    const Node *n = getNode(path);
+    bool na;
+    const Node *n = getNode(path, &na);
     if (n != nullptr) {
-        lstat(n, st);
+        protoToStat(n->stat(), st);
         return 0;
     } else {
         errno = ENOENT;
-        return -1;
+        return na ? -1 : -2;
     }
 }
 
 ssize_t HashFS::readlink(const char *path, char *buf, size_t bufsiz) {
-    const Node *n = getNode(path);
+    bool na;
+    const Node *n = getNode(path, &na);
     if (n != nullptr) {
         if (!S_ISLNK(n->stat().mode())) {
             errno = EINVAL;
@@ -84,42 +72,35 @@ ssize_t HashFS::readlink(const char *path, char *buf, size_t bufsiz) {
 
     } else {
         errno = ENOENT;
-        return -1;
+        return na ? -1 : -2;
     }
 }
 
-int HashFS::getdir(const char *path, void *buf, fuse_fill_dir_t filler) {
-    const Node *n = getNode(path);
+int HashFS::getdir(const char *path, std::map<std::string, struct stat> *dirs) {
+    bool na;
+    const Node *n = getNode(path, &na);
     if (n != nullptr) {
         if (!S_ISDIR(n->stat().mode())) {
             errno = ENOTDIR;
             return -1;
         } else {
             struct stat st{};
-            lstat(n, &st);
-            filler(buf, ".", &st, 0);
-            filler(buf, "..", nullptr, 0);
+            protoToStat(n->stat(), &st);
             for (const auto &d : n->childern()) {
-                lstat(&d.second, &st);
-                if (filler(buf, d.first.c_str(), &st, 0)) {
-                    break;
-                }
+                protoToStat(d.second.stat(), &(*dirs)[d.first]);
             }
-            return 0;
+            return n->partial() ? -2 : 0;
         }
 
     } else {
         errno = ENOENT;
-        return -1;
+        return na ? -1 : -2;
     }
 }
 
 int HashFS::open(const char *pathname, int flags) {
-    if ((flags & (O_WRONLY | O_RDWR)) != 0) {
-        errno = EACCES;
-        return -1;
-    }
-    const Node *n = getNode(pathname);
+    bool na;
+    const Node *n = getNode(pathname, &na);
     if (n != nullptr) {
         if (!S_ISREG(n->stat().mode())) {
             errno = EINVAL;
@@ -129,7 +110,7 @@ int HashFS::open(const char *pathname, int flags) {
         }
     } else {
         errno = ENOENT;
-        return -1;
+        return na ? -1 : -2;
     }
 }
 

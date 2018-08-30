@@ -6,14 +6,14 @@
 
 class HashStore {
 private:
-    std::string base_path;
+    std::string shared_cache_path;
 
     RemoteFSConnection * downloader;
 
     std::string hash_to_path(const std::string &hash);
 
 public:
-    explicit HashStore(std::string store_path, RemoteFSConnection *downloader);
+    HashStore(std::string shared_cache_path, RemoteFSConnection *downloader);
 
     int open_hash(const std::string &hash, const std::string &real_path, int flags);
 };

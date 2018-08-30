@@ -10,18 +10,22 @@
 #include "fs_fuse.h"
 #include "hashfs.h"
 #include "config.h"
+#include "cachefs.h"
 
-static HashFS *fs;
+static HashFS *hfs;
+static CacheFS *cfs;
 
 static int hfs_getattr(const char *path, struct stat *stbuf) {
     int res;
     debug_print("getattr %s\n", path);
 
-    res = fs->lstat(path, stbuf);
+    res = hfs->lstat(path, stbuf);
+    if (res == -2) {
+        res = cfs->lstat(path, stbuf);
+    }
     if (res == -1) {
         return -errno;
     }
-
     return 0;
 }
 
@@ -29,25 +33,37 @@ static int hfs_readlink(const char *path, char *buf, size_t size) {
     ssize_t res;
     debug_print("readlink %s\n", path);
 
-    res = fs->readlink(path, buf, size - 1);
+    res = hfs->readlink(path, buf, size - 1);
+    if (res == -2) {
+        res = cfs->readlink(path, buf, size - 1);
+    }
     if (res == -1) {
         return -errno;
     }
-
     buf[res] = '\0';
     return 0;
 }
 
 static int hfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
                        off_t offset, struct fuse_file_info *fi) {
+    int res;
     debug_print("readdir %s\n", path);
 
     (void) offset;
     (void) fi;
 
-    int res = fs->getdir(path, buf, filler);
+    std::map<std::string, struct stat> dirs;
+    res = hfs->getdir(path, &dirs);
+    if (res == -2) {
+        res = cfs->getdir(path, &dirs);
+    }
     if (res == -1) {
         return -errno;
+    }
+    filler(buf, ".", nullptr, 0);
+    filler(buf, "..", nullptr, 0);
+    for (auto &d : dirs) {
+        filler(buf, d.first.c_str(), &d.second, 0);
     }
 
     return 0;
@@ -56,9 +72,17 @@ static int hfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 static int hfs_open(const char *path, struct fuse_file_info *fi) {
     debug_print("open %s\n", path);
 
+    if ((fi->flags & (O_WRONLY | O_RDWR)) != 0) {
+        errno = EACCES;
+        return -1;
+    }
+
     int fd;
 
-    fd = fs->open(path, fi->flags);
+    fd = hfs->open(path, fi->flags);
+    if (fd == -2) {
+        fd = cfs->open(path, fi->flags);
+    }
     if (fd == -1) {
         return -errno;
     }
@@ -87,8 +111,9 @@ static int hfs_read(const char *path, char *buf, size_t size, off_t offset,
     return res;
 }
 
-int hfs_main(fuse_args args, HashFS *hashfs) {
-    fs = hashfs;
+int hfs_main(fuse_args args, HashFS *hashfs, CacheFS *cachedFS) {
+    hfs = hashfs;
+    cfs = cachedFS;
 
     umask(0);
     fuse_operations hfs_operations{};

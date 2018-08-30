@@ -20,12 +20,13 @@ int main(int argc, char *argv[]) {
     }
     close(res);
 
-    HashFS *hashfs = new HashFS(std::make_unique<filesystem::Filesystem>(std::move(fs)),
-                                std::make_unique<HashStore>(std::move(store)));
+    auto *hashfs = new HashFS(std::make_unique<filesystem::Filesystem>(std::move(fs)), &store);
+    CachedFileStore cachedFileStore("/tmp/private", &remoteFSConnection);
+    auto *cachefs = new CacheFS(&remoteFSConnection, &cachedFileStore);
 
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
     fuse_opt_parse(&args, nullptr, nullptr, nullptr);
     fuse_opt_add_arg(&args, "-oro,allow_other,default_permissions");
 
-    return hfs_main(args, hashfs);
+    return hfs_main(args, hashfs, cachefs);
 }
