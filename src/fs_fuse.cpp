@@ -15,9 +15,23 @@
 static HashFS *hfs;
 static CacheFS *cfs;
 
+static bool ignoredPath(const char *path) {
+    return strncmp(path, "/dev/", 5) == 0 || strncmp(path, "/sys/", 5) == 0 || strncmp(path, "/proc/", 6) == 0 ||
+           strncmp(path, "/tmp/", 5) == 0;
+}
+
+static bool ignoredDir(const char *path) {
+    return strncmp(path, "/dev", 4) == 0 || strncmp(path, "/sys", 4) == 0 || strncmp(path, "/proc", 5) == 0 ||
+           strncmp(path, "/tmp", 4) == 0;
+}
+
 static int hfs_getattr(const char *path, struct stat *stbuf) {
     int res;
     debug_print("getattr %s\n", path);
+
+    if (ignoredPath(path)) {
+        return -ENOENT;
+    }
 
     res = hfs->lstat(path, stbuf);
     if (res == -2) {
@@ -32,6 +46,10 @@ static int hfs_getattr(const char *path, struct stat *stbuf) {
 static int hfs_readlink(const char *path, char *buf, size_t size) {
     ssize_t res;
     debug_print("readlink %s\n", path);
+
+    if (ignoredPath(path)) {
+        return -ENOENT;
+    }
 
     res = hfs->readlink(path, buf, size - 1);
     if (res == -2) {
@@ -52,6 +70,12 @@ static int hfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     (void) offset;
     (void) fi;
 
+    if (ignoredDir(path)) {
+        filler(buf, ".", nullptr, 0);
+        filler(buf, "..", nullptr, 0);
+        return 0;
+    }
+
     std::map<std::string, struct stat> dirs;
     res = hfs->getdir(path, &dirs);
     if (res == -2) {
@@ -71,6 +95,10 @@ static int hfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
 static int hfs_open(const char *path, struct fuse_file_info *fi) {
     debug_print("open %s\n", path);
+
+    if (ignoredPath(path)) {
+        return -ENOENT;
+    }
 
     if ((fi->flags & (O_WRONLY | O_RDWR)) != 0) {
         errno = EACCES;
