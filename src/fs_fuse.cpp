@@ -17,12 +17,12 @@ static CacheFS *cfs;
 
 static bool ignoredPath(const char *path) {
     return strncmp(path, "/dev/", 5) == 0 || strncmp(path, "/sys/", 5) == 0 || strncmp(path, "/proc/", 6) == 0 ||
-           strncmp(path, "/tmp/", 5) == 0;
+           strncmp(path, "/tmp/", 5) == 0 || strncmp(path, "/run/", 5) == 0;
 }
 
 static bool ignoredDir(const char *path) {
     return strncmp(path, "/dev", 4) == 0 || strncmp(path, "/sys", 4) == 0 || strncmp(path, "/proc", 5) == 0 ||
-           strncmp(path, "/tmp", 4) == 0;
+           strncmp(path, "/tmp", 4) == 0 || strncmp(path, "/run", 4) == 0;
 }
 
 static int hfs_getattr(const char *path, struct stat *stbuf) {
