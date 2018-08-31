@@ -26,6 +26,9 @@ int main(int argc, char *argv[]) {
     fuse_opt_parse(&args, nullptr, nullptr, nullptr);
     fuse_opt_add_arg(&args, "-f");
     fuse_opt_add_arg(&args, "-oro,allow_other,default_permissions");
+    if (DEBUG > 1) {
+        fuse_opt_add_arg(&args, "-s");
+    }
 
     res = 0;
     if (DEBUG == 0) {

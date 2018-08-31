@@ -11,7 +11,7 @@ class RemoteFSConnection {
 
     int status_to_errno(const grpc::Status &status);
 
-    std::unordered_map<std::string, std::unique_ptr<std::condition_variable>> concurrent_downloads;
+    std::unordered_map<std::string, std::shared_ptr<std::condition_variable>> concurrent_downloads;
     std::mutex download_mutex;
 
     bool create_base_dir(const std::string &filename);

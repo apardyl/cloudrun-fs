@@ -164,13 +164,16 @@ bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const 
 int RemoteFSConnection::fetch_file(const std::string &filename, const std::string &save_as) {
     {
         std::unique_lock<std::mutex> lock(download_mutex);
-        if (concurrent_downloads.count(filename) == 0) {
-            concurrent_downloads[filename] = std::make_unique<std::condition_variable>();
-        } else {
+        if (concurrent_downloads.count(filename) != 0) {
             do {
-                concurrent_downloads[filename]->wait(lock);
+                std::shared_ptr<std::condition_variable> ptr_cv = concurrent_downloads[filename];
+                ptr_cv->wait(lock);
             } while (concurrent_downloads.count(filename) > 0);
+            if (access(save_as.c_str(), F_OK) == 0) {
+                return 0;
+            }
         }
+        concurrent_downloads[filename] = std::make_shared<std::condition_variable>();
     }
 
     std::string tmp_filename = save_as + ".part";
@@ -178,9 +181,8 @@ int RemoteFSConnection::fetch_file(const std::string &filename, const std::strin
 
     {
         std::unique_lock<std::mutex> lock(download_mutex);
-        auto ptr = std::move(concurrent_downloads[filename]);
+        concurrent_downloads[filename]->notify_all();
         concurrent_downloads.erase(filename);
-        ptr->notify_all();
     }
     return res ? 0 : -1;
 }
