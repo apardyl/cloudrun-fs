@@ -62,6 +62,8 @@ void CacheFS::fetch_node(const std::string &path, filesystem::Node *node) {
     } else {
         debug_print("Fetched node %s\n", path.c_str());
     }
+    // Set partial to false regardless of the result (also cache errors)
+    node->set_partial(false);
 }
 
 CacheFS::CacheFS(RemoteFSConnection *downloader, CachedFileStore *store) : downloader(downloader), store(store) {

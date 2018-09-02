@@ -77,7 +77,6 @@ int RemoteFSConnection::get_dir(const std::string &path, filesystem::Node *node)
         *n.mutable_stat() = item.stat();
         children[item.name()] = std::move(n);
     }
-    node->set_partial(false);
     return 0;
 }
 
