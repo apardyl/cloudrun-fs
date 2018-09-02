@@ -13,7 +13,7 @@ const filesystem::Node *CacheFS::getNode(const char *path) {
 
     Node *node = fs->mutable_root();
     if (fs->root().stat().mode() == 0) {
-        debug_print("Creating  new cache root %s\n", "/");
+        debug_print("Creating new cache root %s\n", "/");
         int res = downloader->get_stat("/", fs->mutable_root()->mutable_stat());
         if (res != 0) {
             return nullptr;

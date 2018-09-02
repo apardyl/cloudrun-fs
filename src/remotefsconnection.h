@@ -16,7 +16,7 @@ class RemoteFSConnection {
 
     bool create_base_dir(const std::string &filename);
 
-    bool fetch_file_internal(const std::string &filename, const std::string &save_as, const std::string &tmp_filename);
+    bool fetch_file_internal(const std::string &filename, const std::string &save_as);
 
 public:
     explicit RemoteFSConnection(const std::string &server_address);

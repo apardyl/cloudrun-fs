@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <utils/randomutils.h>
 
 CachedFileStore::CachedFileStore(std::string private_cache_path, RemoteFSConnection *downloader)
         : private_cache_path(std::move(private_cache_path)), downloader(downloader) {
@@ -48,7 +49,15 @@ int CachedFileStore::open_file(const std::string &path, int flags) {
         }
     }
     debug_print("Fetching file %s\n", path.c_str());
-    if (downloader->fetch_file(path, cache_path) == 0) {
+
+    std::string tmp_path = cache_path + '.' +random_string(10);
+
+    if (downloader->fetch_file(path, tmp_path) == 0) {
+        if (rename(tmp_path.c_str(), cache_path.c_str())) {
+            debug_print("Error moving file %s to %s errno: %d\n", tmp_path.c_str(), cache_path.c_str(), errno);
+            errno = EACCES;
+            return -1;
+        }
         fd = open(cache_path.c_str(), flags);
         if (fd == -1) {
             debug_print("ERROR: Unable to open file %s from cache %s after successful fetch\n",

@@ -97,8 +97,7 @@ bool RemoteFSConnection::create_base_dir(const std::string &filename) {
     return true;
 }
 
-bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const std::string &save_as,
-                                             const std::string &tmp_filename) {
+bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const std::string &save_as) {
     // Check if the file already exists before attempting download.
     if (access(save_as.c_str(), F_OK) == 0) {
         return true;
@@ -109,9 +108,9 @@ bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const 
         return false;
     }
 
-    int fd = open(tmp_filename.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRWXU);
+    int fd = open(save_as.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRWXU);
     if (fd == -1) {
-        debug_print("Unable to create file %s errno: %d\n", tmp_filename.c_str(), errno);
+        debug_print("Unable to create file %s errno: %d\n", save_as.c_str(), errno);
         return false;
     }
 
@@ -129,7 +128,7 @@ bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const 
         do {
             res = write(fd, response.data().data() + offset, response.data().size() - offset);
             if (res == -1 || (res < response.data().size() && errno != EINTR)) {
-                debug_print("Error writing to file %s errno: %d\n", tmp_filename.c_str(), errno);
+                debug_print("Error writing to file %s errno: %d\n", save_as.c_str(), errno);
                 context.TryCancel();
                 error = true;
                 break;
@@ -140,7 +139,7 @@ bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const 
 
     if (close(fd)) {
         error = true;
-        debug_print("Error closing file %s errno: %d\n", tmp_filename.c_str(), errno);
+        debug_print("Error closing file %s errno: %d\n", save_as.c_str(), errno);
     }
     Status status = reader->Finish();
     if (!status.ok()) {
@@ -148,15 +147,10 @@ bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const 
         debug_print("rpc error: %s: %s\n", status.error_message().c_str(), status.error_details().c_str());
     }
     if (error) {
-        if (unlink(tmp_filename.c_str())) {
-            debug_print("Error removing file %s errno: %d\n", tmp_filename.c_str(), errno);
+        if (unlink(save_as.c_str())) {
+            debug_print("Error removing file %s errno: %d\n", save_as.c_str(), errno);
         }
         return false;
-    } else {
-        if (rename(tmp_filename.c_str(), save_as.c_str())) {
-            debug_print("Error moving file %s to %s errno: %d\n", tmp_filename.c_str(), save_as.c_str(), errno);
-            return false;
-        }
     }
     return true;
 }
@@ -176,8 +170,7 @@ int RemoteFSConnection::fetch_file(const std::string &filename, const std::strin
         concurrent_downloads[filename] = std::make_shared<std::condition_variable>();
     }
 
-    std::string tmp_filename = save_as + ".part";
-    bool res = fetch_file_internal(filename, save_as, tmp_filename);
+    bool res = fetch_file_internal(filename, save_as);
 
     {
         std::unique_lock<std::mutex> lock(download_mutex);
