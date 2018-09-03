@@ -19,7 +19,16 @@ int HashStore::open_hash(const std::string &hash, const std::string &real_path, 
         debug_print("Found file for hash %s\n", hash.c_str());
         return res;
     }
-    debug_print("Fetching file for hash %s\n", hash.c_str());
+
+    {
+        std::lock_guard<std::mutex> guard(hash_missmaches_mutex);
+        if (hash_missmaches.count(real_path) > 0) {
+            debug_print("Previous hash mismatch for %s, skipping\n", real_path.c_str());
+            return -2;
+        }
+    }
+
+    debug_print("Fetching file for hash %s: %s\n", hash.c_str(), real_path.c_str());
 
     std::string tmp_path = path + '.' + random_string(10);
 
@@ -39,6 +48,10 @@ int HashStore::open_hash(const std::string &hash, const std::string &real_path, 
                         hash.c_str());
             if (unlink(tmp_path.c_str())) {
                 debug_print("Unable to remove: %s\n", tmp_path.c_str(), errno);
+            }
+            {
+                std::lock_guard<std::mutex> guard(hash_missmaches_mutex);
+                hash_missmaches.insert(real_path);
             }
             errno = EACCES;
             // TODO: copy/move file to private store.

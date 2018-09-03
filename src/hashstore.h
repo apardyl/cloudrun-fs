@@ -12,6 +12,9 @@ private:
 
     std::string hash_to_path(const std::string &hash);
 
+    std::unordered_set<std::string> hash_missmaches;
+
+    std::mutex hash_missmaches_mutex;
 public:
     HashStore(std::string shared_cache_path, RemoteFSConnection *downloader);
 
