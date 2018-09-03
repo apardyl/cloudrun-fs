@@ -8,7 +8,7 @@
 
 const int buffsize = 32768;
 
-int sha256_file(const std::string& path, std::string* checksum) {
+int sha256_file(const std::string &path, std::string *checksum) {
     FILE *file = fopen(path.c_str(), "rb");
     if (!file) {
         debug_print("Unable to open file: %s, errno: %d\n", path.c_str(), errno);
@@ -17,8 +17,9 @@ int sha256_file(const std::string& path, std::string* checksum) {
     SHA256_CTX sha256_ctx{};
     SHA256_Init(&sha256_ctx);
     unsigned char buffer[buffsize];
-    while (fread(buffer, 1, buffsize, file)) {
-        SHA256_Update(&sha256_ctx, buffer, buffsize);
+    size_t bytesread = 0;
+    while ((bytesread = fread(buffer, 1, buffsize, file))) {
+        SHA256_Update(&sha256_ctx, buffer, bytesread);
     }
     fclose(file);
     unsigned char hash[SHA256_DIGEST_LENGTH];
