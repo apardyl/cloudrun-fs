@@ -27,9 +27,9 @@ const filesystem::Node *CacheFS::getNode(const char *path) {
     for (; *path != '\0'; path++) {
         current_path += *path;
         if (*path == '/') {
-            auto n = node->mutable_childern()->find(name);
+            auto n = node->mutable_children()->find(name);
             name.clear();
-            if (n == node->childern().end()) {
+            if (n == node->children().end()) {
                 return nullptr;
             } else {
                 node = &n->second;
@@ -42,8 +42,8 @@ const filesystem::Node *CacheFS::getNode(const char *path) {
         }
     }
     if (!name.empty()) {
-        auto n = node->mutable_childern()->find(name);
-        if (n == node->mutable_childern()->end()) {
+        auto n = node->mutable_children()->find(name);
+        if (n == node->mutable_children()->end()) {
             return nullptr;
         } else {
             node = &n->second;
@@ -111,7 +111,7 @@ int CacheFS::getdir(const char *path, std::map<std::string, struct stat> *dirs) 
         }
         struct stat st{};
         protoToStat(n->stat(), &st);
-        for (const auto &d : n->childern()) {
+        for (const auto &d : n->children()) {
             protoToStat(d.second.stat(), &(*dirs)[d.first]);
         }
         return 0;

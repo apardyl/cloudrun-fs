@@ -19,9 +19,9 @@ const Node *HashFS::getNode(const char *path, bool *noent_authoritative) {
     std::string name;
     for (; *path != '\0'; path++) {
         if (*path == '/') {
-            auto n = node->childern().find(name);
+            auto n = node->children().find(name);
             name.clear();
-            if (n == node->childern().end()) {
+            if (n == node->children().end()) {
                 *noent_authoritative = !node->partial();
                 return nullptr;
             } else {
@@ -32,8 +32,8 @@ const Node *HashFS::getNode(const char *path, bool *noent_authoritative) {
         }
     }
     if (!name.empty()) {
-        auto n = node->childern().find(name);
-        if (n == node->childern().end()) {
+        auto n = node->children().find(name);
+        if (n == node->children().end()) {
             *noent_authoritative = !node->partial();
             return nullptr;
         } else {
@@ -86,7 +86,7 @@ int HashFS::getdir(const char *path, std::map<std::string, struct stat> *dirs) {
         } else {
             struct stat st{};
             protoToStat(n->stat(), &st);
-            for (const auto &d : n->childern()) {
+            for (const auto &d : n->children()) {
                 protoToStat(d.second.stat(), &(*dirs)[d.first]);
             }
             return n->partial() ? -2 : 0;

@@ -66,7 +66,7 @@ int RemoteFSConnection::get_dir(const std::string &path, filesystem::Node *node)
     if (!status.ok()) {
         return status_to_errno(status);
     }
-    auto &children = *(node->mutable_childern());
+    auto &children = *(node->mutable_children());
     for (auto &item : response.item()) {
         debug_print("Adding item %s to %s\n", item.name().c_str(), path.c_str());
         auto n = filesystem::Node();
