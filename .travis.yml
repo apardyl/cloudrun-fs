@@ -1,10 +1,6 @@
 dist: trusty
 language: cpp
 
-cache:
-  directories:
-    - $HOME/.cache/bazel
-
 addons:
   apt:
     sources:
@@ -22,7 +18,7 @@ before_install:
   - ./install.sh --user
   - rm -f install.sh
   - export PATH=$HOME/bin:$PATH
-
-script:
   - export CC=gcc-7
-  - bazel build client:cloudrun-fs --verbose_failures --spawn_strategy=standalone --genrule_strategy=standalone --curses=no --jobs=4
+  - echo "$GCS_KEY" | base64 -d > "$HOME"/gcs.key
+script:
+  - bazel build client:cloudrun-fs --verbose_failures --spawn_strategy=standalone --genrule_strategy=standalone --curses=no --jobs=4 --remote_http_cache=https://storage.googleapis.com/cloudrun-bazel --google_credentials="$HOME"/gcs.key
