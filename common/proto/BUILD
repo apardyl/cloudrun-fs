@@ -7,7 +7,7 @@ cc_proto_library(
     name = "cloudrun-fs-proto",
     protos = [
         "filesystem.proto",
-        "remotefs.proto"
+        "remotefs.proto",
     ],
     with_grpc = True,
 )
@@ -20,4 +20,4 @@ cc_library(
     deps = [
         ":cloudrun-fs-proto",
     ] + GRPC_COMPILE_DEPS,
-)       
+)

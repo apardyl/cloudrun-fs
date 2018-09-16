@@ -6,7 +6,7 @@ cc_library(
     hdrs = glob(["**/*.h"]),
     deps = [
         "//common:cloudrun-fs-common",
-    ]
+    ],
 )
 
 cc_binary(
@@ -20,10 +20,10 @@ load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar", "pkg_deb")
 
 pkg_tar(
     name = "cloudrun-fs-server-pkg",
-    strip_prefix = "/server",
-    package_dir = "/usr/bin",
     srcs = [":cloudrun-fs-server"],
     mode = "0755",
+    package_dir = "/usr/bin",
+    strip_prefix = "/server",
 )
 
 pkg_deb(
@@ -33,8 +33,8 @@ pkg_deb(
     depends = [
         "libc6 (>= 2.17)",
     ],
-    package = "cloudrun-fs-server",
+    description = "Server for cloudrun-fs.",
     maintainer = "The Cloudrun authors <dev@cloudrun.io>",
+    package = "cloudrun-fs-server",
     version = "0.1",
-    description = "Server for cloudrun-fs."
 )
