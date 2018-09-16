@@ -11,7 +11,7 @@ addons:
     - g++-7
     - gcc-7
 env:
-  - BAZEL_V=0.17.1 CC=gcc-7 CXX=g++-7
+  - BAZEL_V=0.17.1
 before_install:
   - wget -O install.sh "https://github.com/bazelbuild/bazel/releases/download/${BAZEL_V}/bazel-${BAZEL_V}-installer-linux-x86_64.sh"
   - chmod +x install.sh
@@ -19,4 +19,5 @@ before_install:
   - rm -f install.sh
 
 script:
+  - export CC=gcc-7
   - bazel build client:cloudrun-fs --verbose_failures --spawn_strategy=standalone --genrule_strategy=standalone
