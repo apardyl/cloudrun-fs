@@ -15,6 +15,7 @@ cc_library(
         "sha256.h",
     ],
     deps = [
-        "//common/proto:cloudrun-fs-grpc"
+        "//common/proto:cloudrun-fs-grpc",
+        "//external:libssl",
     ],
 )

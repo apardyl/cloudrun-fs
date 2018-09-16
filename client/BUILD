@@ -32,3 +32,28 @@ cc_binary(
         "@system_libs//:fuse",
     ],
 )
+
+load("@bazel_tools//tools/build_defs/pkg:pkg.bzl", "pkg_tar", "pkg_deb")
+
+pkg_tar(
+    name = "cloudrun-fs-pkg",
+    strip_prefix = "/client",
+    package_dir = "/usr/bin",
+    srcs = [":cloudrun-fs"],
+    mode = "0755",
+)
+
+pkg_deb(
+    name = "cloudrun-fs-deb",
+    architecture = "amd64",
+    data = ":cloudrun-fs-pkg",
+    depends = [
+        "fuse",
+        "libc6 (>= 2.17)",
+        "libfuse2 (>= 2.9)",
+    ],
+    package = "cloudrun-fs",
+    maintainer = "The Cloudrun authors <dev@cloudrun.io>",
+    version = "0.1",
+    description = "Read-only caching file system based on FUSE for cloudrun project."
+)
