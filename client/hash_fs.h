@@ -3,7 +3,7 @@
 
 #include <sys/stat.h>
 #include "common/proto/filesystem.pb.h"
-#include "hashstore.h"
+#include "hash_store.h"
 
 class HashFS {
 private:

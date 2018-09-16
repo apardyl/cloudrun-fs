@@ -4,9 +4,9 @@
 #include <cerrno>
 
 #include "fs_fuse.h"
-#include "hashfs.h"
+#include "hash_fs.h"
 #include "common/config.h"
-#include "cachefs.h"
+#include "cache_fs.h"
 
 static HashFS *hfs;
 static CacheFS *cfs;

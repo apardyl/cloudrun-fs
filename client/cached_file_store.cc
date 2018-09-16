@@ -1,10 +1,10 @@
-#include "cachedfilestore.h"
+#include "cached_file_store.h"
 #include "common/config.h"
 
 #include <unistd.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include "common/randomutils.h"
+#include "common/random_utils.h"
 
 CachedFileStore::CachedFileStore(std::string private_cache_path, RemoteFSConnection *downloader)
         : private_cache_path(std::move(private_cache_path)), downloader(downloader) {

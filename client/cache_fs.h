@@ -1,8 +1,8 @@
 #ifndef CLOUDRUN_HASHFS_CACHEFS_H
 #define CLOUDRUN_HASHFS_CACHEFS_H
 
-#include "remotefsconnection.h"
-#include "cachedfilestore.h"
+#include "remote_fs_connection.h"
+#include "cached_file_store.h"
 
 class CacheFS {
 private:

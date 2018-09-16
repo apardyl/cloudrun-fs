@@ -2,7 +2,7 @@
 #define HASHFS_DATASTORE_H
 
 #include <string>
-#include "remotefsconnection.h"
+#include "remote_fs_connection.h"
 
 class HashStore {
 private:

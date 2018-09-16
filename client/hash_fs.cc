@@ -1,5 +1,5 @@
-#include "common/fsutils.h"
-#include "hashfs.h"
+#include "common/fs_utils.h"
+#include "hash_fs.h"
 
 using namespace filesystem;
 

@@ -1,6 +1,6 @@
-#include "hashstore.h"
+#include "hash_store.h"
 #include "common/config.h"
-#include "common/randomutils.h"
+#include "common/random_utils.h"
 #include "common/sha256.h"
 
 #include <utility>

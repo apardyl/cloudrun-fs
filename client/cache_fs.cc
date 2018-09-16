@@ -1,5 +1,5 @@
-#include "common/fsutils.h"
-#include "cachefs.h"
+#include "common/fs_utils.h"
+#include "cache_fs.h"
 #include "common/config.h"
 
 using namespace filesystem;

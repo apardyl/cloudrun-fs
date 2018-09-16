@@ -1,7 +1,7 @@
 #ifndef CLOUDRUN_HASHFS_FILESTORE_H
 #define CLOUDRUN_HASHFS_FILESTORE_H
 
-#include "remotefsconnection.h"
+#include "remote_fs_connection.h"
 
 class CachedFileStore {
     std::string private_cache_path;

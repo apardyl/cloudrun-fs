@@ -1,6 +1,6 @@
 #include <memory>
 
-#include "remotefsconnection.h"
+#include "remote_fs_connection.h"
 #include "common/config.h"
 #include <grpc/grpc.h>
 #include <grpc++/channel.h>
@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include "common/fsutils.h"
+#include "common/fs_utils.h"
 #include "common/proto/filesystem.pb.h"
 
 using namespace remotefs;

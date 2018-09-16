@@ -1,8 +1,8 @@
 #ifndef HASHFS_FUSE_H
 #define HASHFS_FUSE_H
 
-#include "hashfs.h"
-#include "cachefs.h"
+#include "hash_fs.h"
+#include "cache_fs.h"
 
 #define FUSE_USE_VERSION 26
 #define _XOPEN_SOURCE 700
