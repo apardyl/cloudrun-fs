@@ -10,4 +10,4 @@ before_install:
   - rm -f install.sh
 
 script:
-  - "$HOME"/bin/bazel build client:cloudrun-fs --verbose_failures --spawn_strategy=standalone --genrule_strategy=standalone
+  - bazel build client:cloudrun-fs --verbose_failures --spawn_strategy=standalone --genrule_strategy=standalone
