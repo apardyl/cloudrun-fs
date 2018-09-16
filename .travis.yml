@@ -1,6 +1,10 @@
 dist: trusty
 language: cpp
 
+cache:
+  directories:
+    - $HOME/.cache/bazel
+
 addons:
   apt:
     sources:
@@ -17,7 +21,8 @@ before_install:
   - chmod +x install.sh
   - ./install.sh --user
   - rm -f install.sh
+  - export PATH=$HOME/bin:$PATH
 
 script:
   - export CC=gcc-7
-  - bazel build client:cloudrun-fs --verbose_failures --spawn_strategy=standalone --genrule_strategy=standalone
+  - bazel build client:cloudrun-fs --verbose_failures --spawn_strategy=standalone --genrule_strategy=standalone --curses=no --jobs=4
