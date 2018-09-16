@@ -1,7 +1,7 @@
 #include "hashstore.h"
-#include "config.h"
-#include "utils/randomutils.h"
-#include "utils/sha256.h"
+#include "common/config.h"
+#include "common/randomutils.h"
+#include "common/sha256.h"
 
 #include <utility>
 #include <fcntl.h>

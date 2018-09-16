@@ -2,8 +2,7 @@
 #define HASHFS_HASHFS_H
 
 #include <sys/stat.h>
-#include <fuse.h>
-#include "proto/filesystem.pb.h"
+#include "common/proto/filesystem.pb.h"
 #include "hashstore.h"
 
 class HashFS {

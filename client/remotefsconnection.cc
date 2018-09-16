@@ -1,17 +1,17 @@
 #include <memory>
 
 #include "remotefsconnection.h"
-#include "config.h"
+#include "common/config.h"
 #include <grpc/grpc.h>
-#include <grpcpp/channel.h>
-#include <grpcpp/client_context.h>
-#include <grpcpp/create_channel.h>
-#include <grpcpp/security/credentials.h>
+#include <grpc++/channel.h>
+#include <grpc++/client_context.h>
+#include <grpc++/create_channel.h>
+#include <grpc++/security/credentials.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <utils/fsutils.h>
-#include "proto/filesystem.pb.h"
+#include "common/fsutils.h"
+#include "common/proto/filesystem.pb.h"
 
 using namespace remotefs;
 using grpc::ClientContext;

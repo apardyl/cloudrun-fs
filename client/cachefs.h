@@ -1,7 +1,6 @@
 #ifndef CLOUDRUN_HASHFS_CACHEFS_H
 #define CLOUDRUN_HASHFS_CACHEFS_H
 
-#include <fuse.h>
 #include "remotefsconnection.h"
 #include "cachedfilestore.h"
 

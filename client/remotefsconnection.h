@@ -1,7 +1,7 @@
 #ifndef CLOUDRUN_HASHFS_FILEREQUESTER_H
 #define CLOUDRUN_HASHFS_FILEREQUESTER_H
 
-#include "proto/remotefs.grpc.pb.h"
+#include "common/proto/remotefs.grpc.pb.h"
 #include <unordered_map>
 #include <mutex>
 #include <condition_variable>

@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package remotefs;
+
+import "common/proto/filesystem.proto";
+
+// node -> client
+service RemoteFS {
+    rpc GetChecksum (FileRequest) returns (ChecksumResponse);
+    rpc GetStat (FileRequest) returns (filesystem.Stat);
+    rpc GetLink (FileRequest) returns (LinkResponse);
+    rpc GetData (FileRequest) returns (stream DataChunkResponse);
+    rpc ListDirectory (FileRequest) returns (FileListResponse);
+    rpc PutFile (stream DataChunkRequest) returns (Empty);
+}
+
+message FileRequest {
+    string path = 1;
+}
+
+message ChecksumResponse {
+    string checksum = 1;
+}
+
+message LinkResponse {
+    string target = 1;
+}
+
+message DataChunkResponse {
+    bytes data = 1;
+}
+
+message DataChunkRequest {
+    message Request {
+        string path = 1;
+        filesystem.Stat stat = 2;
+    }
+
+    oneof payload {
+        Request request = 1;
+        bytes data = 2;
+    }
+}
+
+message FileListResponse {
+    message DirEntity {
+        string name = 1;
+        filesystem.Stat stat = 2;
+
+        // Symlink target
+        string target = 3;
+    }
+
+    repeated DirEntity item = 1;
+}
+
+message Empty {
+}

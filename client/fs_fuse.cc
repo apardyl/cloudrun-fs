@@ -1,7 +1,3 @@
-#define FUSE_USE_VERSION 26
-#define _XOPEN_SOURCE 700
-
-#include <fuse.h>
 #include <cstdio>
 #include <unistd.h>
 #include <dirent.h>
