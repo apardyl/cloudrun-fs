@@ -2,17 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "cloudrun-fs-server-lib",
-    srcs = [
-        "rpc/RemoteFSService.cc",
-        "rpc/RemoteFSServer.cc",
-        "scanfs/scanfs.cc",
-        "main.cc",
-    ],
-    hdrs = [
-        "rpc/RemoteFSServer.h",
-        "rpc/RemoteFSService.h",
-        "scanfs/scanfs.h",
-    ],
+    srcs = glob(["**/*.cc"]),
+    hdrs = glob(["**/*.h"]),
     deps = [
         "//common:cloudrun-fs-common",
     ]

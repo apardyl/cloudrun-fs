@@ -2,18 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "cloudrun-fs-common",
-    srcs = [
-        "config.cc",
-        "fsutils.cc",
-        "randomutils.cc",
-        "sha256.cc",
-    ],
-    hdrs = [
-        "config.h",
-        "fsutils.h",
-        "randomutils.h",
-        "sha256.h",
-    ],
+    srcs = glob(["**/*.cc"], exclude = ["proto/**"]),
+    hdrs = glob(["**/*.h"], exclude = ["proto/**"]),
     deps = [
         "//common/proto:cloudrun-fs-grpc",
         "//external:libssl",

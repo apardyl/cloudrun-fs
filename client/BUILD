@@ -2,24 +2,8 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "cloudrun-fs-lib",
-    srcs = [
-        "cachedfilestore.cc",
-        "cachefs.cc",
-        "fs_fuse.cc",
-        "hashfs.cc",
-        "hashstore.cc",
-        "main.cc",
-        "remotefsconnection.cc",
-    ],
-    hdrs = [
-        "cachedfilestore.h",
-        "cachefs.h",
-        "config.h",
-        "fs_fuse.h",
-        "hashfs.h",
-        "hashstore.h",
-        "remotefsconnection.h",
-    ],
+    srcs = glob(["**/*.cc"]),
+    hdrs = glob(["**/*.h"]),
     deps = [
         "//common:cloudrun-fs-common",
     ]
