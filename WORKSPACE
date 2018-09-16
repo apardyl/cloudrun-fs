@@ -8,15 +8,3 @@ git_repository(
 
 load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cpp_proto_repositories")
 cpp_proto_repositories()
-
-new_local_repository(
-  name = "system_libs",
-  path = "/usr/lib/",
-  build_file_content = """
-cc_library(
-    name = "fuse",
-    srcs = ["libfuse.so"],
-    visibility = ["//visibility:public"],
-)
-""",
-)

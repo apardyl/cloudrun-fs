@@ -11,9 +11,11 @@ cc_library(
 
 cc_binary(
     name = "cloudrun-fs",
+    linkopts = [
+        "-lfuse",
+    ],
     deps = [
         ":cloudrun-fs-lib",
-        "@system_libs//:fuse",
     ],
 )
 
@@ -34,7 +36,7 @@ pkg_deb(
     depends = [
         "fuse",
         "libc6 (>= 2.17)",
-        "libfuse2 (>= 2.9)",
+        "libfuse2 (>= 2.6)",
     ],
     description = "Read-only caching file system based on FUSE for cloudrun project.",
     maintainer = "The Cloudrun authors <dev@cloudrun.io>",

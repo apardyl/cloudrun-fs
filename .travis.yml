@@ -1,6 +1,11 @@
 dist: trusty
 language: cpp
 
+addons:
+  apt:
+    packages:
+    - fuse
+    - libfuse-dev
 env:
   - BAZEL_V=0.17.1
 before_install:
