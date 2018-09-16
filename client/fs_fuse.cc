@@ -5,7 +5,7 @@
 
 #include "fs_fuse.h"
 #include "hashfs.h"
-#include "config.h"
+#include "common/config.h"
 #include "cachefs.h"
 
 static HashFS *hfs;

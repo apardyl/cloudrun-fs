@@ -1,5 +1,5 @@
 #include "cachedfilestore.h"
-#include "config.h"
+#include "common/config.h"
 
 #include <unistd.h>
 #include <sys/stat.h>

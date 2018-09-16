@@ -1,7 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include "fs_fuse.h"
-#include "config.h"
+#include "common/config.h"
 
 
 int main(int argc, char *argv[]) {
