@@ -30,23 +30,10 @@ int main(int argc, char *argv[]) {
         fuse_opt_add_arg(&args, "-s");
     }
 
-    res = 0;
-    if (DEBUG == 0) {
-        res = fork();
-        if (res == 0) {
-            setsid();
-            chdir("/");
-        }
-    }
-
-    if (res == 0) {
-        auto *remoteFSConnection = new RemoteFSConnection(argv[4]);
-        auto *store = new HashStore(argv[2], remoteFSConnection);
-        auto *hashfs = new HashFS(std::unique_ptr<filesystem::Filesystem>(fs), store);
-        auto *cachedFileStore = new CachedFileStore(argv[3], remoteFSConnection);
-        auto *cachefs = new CacheFS(remoteFSConnection, cachedFileStore);
-        return hfs_main(args, hashfs, cachefs);
-    }
-
-    return 0;
+    auto *remoteFSConnection = new RemoteFSConnection(argv[4]);
+    auto *store = new HashStore(argv[2], remoteFSConnection);
+    auto *hashfs = new HashFS(std::unique_ptr<filesystem::Filesystem>(fs), store);
+    auto *cachedFileStore = new CachedFileStore(argv[3], remoteFSConnection);
+    auto *cachefs = new CacheFS(remoteFSConnection, cachedFileStore);
+    return hfs_main(args, hashfs, cachefs);
 }
