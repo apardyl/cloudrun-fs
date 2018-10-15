@@ -6,6 +6,7 @@ cc_library(
     hdrs = glob(["**/*.h"]),
     deps = [
         "//common:cloudrun-fs-common",
+        "@com_github_libfuse//:libfuse"
     ],
 )
 
@@ -13,7 +14,6 @@ cc_binary(
     name = "cloudrun-fs",
     deps = [
         ":cloudrun-fs-lib",
-        "@com_github_libfuse//:libfuse"
     ],
 )
 
