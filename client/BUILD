@@ -11,11 +11,9 @@ cc_library(
 
 cc_binary(
     name = "cloudrun-fs",
-    linkopts = [
-        "-lfuse",
-    ],
     deps = [
         ":cloudrun-fs-lib",
+        "@com_github_libfuse//:libfuse"
     ],
 )
 
