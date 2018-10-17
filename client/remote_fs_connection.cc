@@ -96,21 +96,21 @@ bool RemoteFSConnection::create_base_dir(const std::string &filename) {
     return true;
 }
 
-bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const std::string &save_as) {
-    // Check if the file already exists before attempting download.
+int RemoteFSConnection::fetch_file(const std::string &filename, const std::string &save_as) {
+    LockMapGuard<std::string> guard(lock_map, filename);
     if (access(save_as.c_str(), F_OK) == 0) {
-        return true;
+        return 0;
     }
 
     if (!create_base_dir(save_as)) {
         debug_print("Unable to create base directory for file %s errno: %d\n", save_as.c_str(), errno);
-        return false;
+        return -1;
     }
 
     int fd = open(save_as.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRWXU);
     if (fd == -1) {
         debug_print("Unable to create file %s errno: %d\n", save_as.c_str(), errno);
-        return false;
+        return -1;
     }
 
     bool error = false;
@@ -126,7 +126,8 @@ bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const 
         size_t offset = 0;
         do {
             res = write(fd, response.data().data() + offset, response.data().size() - offset);
-            if (res == -1 || (res < response.data().size() && errno != EINTR)) {
+            if (res < 0 || (static_cast<unsigned long int>(res) < response.data().size() &&
+                            errno != EINTR)) {
                 debug_print("Error writing to file %s errno: %d\n", save_as.c_str(), errno);
                 context.TryCancel();
                 error = true;
@@ -149,34 +150,9 @@ bool RemoteFSConnection::fetch_file_internal(const std::string &filename, const 
         if (unlink(save_as.c_str())) {
             debug_print("Error removing file %s errno: %d\n", save_as.c_str(), errno);
         }
-        return false;
+        return -1;
     }
-    return true;
-}
-
-int RemoteFSConnection::fetch_file(const std::string &filename, const std::string &save_as) {
-    {
-        std::unique_lock<std::mutex> lock(download_mutex);
-        if (concurrent_downloads.count(filename) != 0) {
-            do {
-                std::shared_ptr<std::condition_variable> ptr_cv = concurrent_downloads[filename];
-                ptr_cv->wait(lock);
-            } while (concurrent_downloads.count(filename) > 0);
-            if (access(save_as.c_str(), F_OK) == 0) {
-                return 0;
-            }
-        }
-        concurrent_downloads[filename] = std::make_shared<std::condition_variable>();
-    }
-
-    bool res = fetch_file_internal(filename, save_as);
-
-    {
-        std::unique_lock<std::mutex> lock(download_mutex);
-        concurrent_downloads[filename]->notify_all();
-        concurrent_downloads.erase(filename);
-    }
-    return res ? 0 : -1;
+    return 0;
 }
 
 int RemoteFSConnection::status_to_errno(const Status &status) {

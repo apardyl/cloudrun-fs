@@ -2,6 +2,7 @@
 #define CLOUDRUN_HASHFS_FILEREQUESTER_H
 
 #include "common/proto/remotefs.grpc.pb.h"
+#include "common/lock_map.h"
 #include <unordered_map>
 #include <mutex>
 #include <condition_variable>
@@ -11,12 +12,9 @@ class RemoteFSConnection {
 
     int status_to_errno(const grpc::Status &status);
 
-    std::unordered_map<std::string, std::shared_ptr<std::condition_variable>> concurrent_downloads;
-    std::mutex download_mutex;
+    LockMap<std::string> lock_map;
 
     bool create_base_dir(const std::string &filename);
-
-    bool fetch_file_internal(const std::string &filename, const std::string &save_as);
 
 public:
     explicit RemoteFSConnection(const std::string &server_address);
